@@ -14,6 +14,7 @@ public class PlayerInput : MonoBehaviour
     public Vector2 velocityMaxCrouched = new Vector2(2.5f, 0);
     public Vector2 velocityMinCrouched = new Vector2(-2.5f, 0);
     private bool touchingFloor = false;
+    private GameObject equipedWeapon = null;
 
     void Start() {
         forceLimit = forceLimitUp;
@@ -61,6 +62,34 @@ public class PlayerInput : MonoBehaviour
         if (velocity.y > velocityMax.y) velocity.y = velocityMax.y;
         if (move.x == 0) velocity.x = 0;
         this.GetComponent<Rigidbody2D>().velocity = velocity;
+
+        // weapons
+        GameObject[] weapons = GameObject.FindGameObjectsWithTag("Weapon");
+        GameObject availableWeapon = null;
+        foreach (GameObject weapon in weapons) {
+            if (weapon.transform.position.x > this.transform.position.x-this.transform.localScale.x/2
+                && weapon.transform.position.x < this.transform.position.x+this.transform.localScale.x/2) {
+                    availableWeapon = weapon;
+                    break;
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.F)) {
+            if (equipedWeapon != null) {
+                equipedWeapon.transform.parent = null;
+                equipedWeapon.GetComponent<Rigidbody2D>().isKinematic = false;
+                equipedWeapon.GetComponent<Rigidbody2D>().AddForce(new Vector2(200, 0));
+                equipedWeapon = null;
+            }
+            else if (availableWeapon != null) {
+                equipedWeapon = availableWeapon;
+                equipedWeapon.GetComponent<Rigidbody2D>().isKinematic = true;
+                equipedWeapon.transform.parent = this.transform;
+                Vector3 weaponPosition = equipedWeapon.transform.localPosition;
+                weaponPosition.x = this.transform.localScale.x/2 + equipedWeapon.transform.localScale.x/2;
+                weaponPosition.y = 0;
+                equipedWeapon.transform.localPosition = weaponPosition;
+            }
+        }
     }
 
     void OnCollisionStay2D(Collision2D collision) {
