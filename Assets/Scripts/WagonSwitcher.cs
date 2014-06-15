@@ -4,7 +4,7 @@ using System.Collections;
 public class WagonSwitcher : MonoBehaviour {
     public Transform fadeOnCollide = null;
     public Transform camera = null;
-
+    
 	// Use this for initialization
 	void Start () {
 	
@@ -16,17 +16,36 @@ public class WagonSwitcher : MonoBehaviour {
 	}
 
     void OnCollisionEnter2D(Collision2D collision){
-        if (fadeOnCollide){
-            StartCoroutine("Fade");
-            var go = GameObject.FindGameObjectsWithTag("Foreground");
-            foreach (var g in go){
-                if (g.transform != fadeOnCollide){
-                    StartCoroutine("FadeOther", g.transform);
+        if (collision.gameObject.tag == "Player" && fadeOnCollide.renderer.material.color.a == 1.0f)
+        {
+            if (fadeOnCollide)
+            {
+                StartCoroutine("Fade");
+                var go = GameObject.FindGameObjectsWithTag("Foreground");
+                foreach (var g in go)
+                {
+                    if (g.transform != fadeOnCollide)
+                    {
+                        StartCoroutine("FadeOther", g.transform);
+                    }
                 }
             }
-        }
-        if (camera){
-            StartCoroutine("BringCamera");
+            if (camera)
+            {
+                StartCoroutine("BringCamera");
+            }
+
+            float newX = 0;
+            if (collision.gameObject.transform.position.x > this.transform.position.x)
+            {
+                newX = this.transform.position.x + this.transform.localScale.x / 2 - collision.gameObject.transform.localScale.x / 2;
+            }
+            else
+            {
+                newX = this.transform.position.x - this.transform.localScale.x / 2;
+            }
+
+            collision.gameObject.transform.position = new Vector3(newX, collision.gameObject.transform.position.y, collision.gameObject.transform.position.z);
         }
     }
 

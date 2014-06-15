@@ -63,7 +63,7 @@ public class PlayerInput : MonoBehaviour
         this.GetComponent<Rigidbody2D>().velocity = velocity;
     }
 
-    void OnCollisionEnter2D(Collision2D collision) {
+    void OnCollisionStay2D(Collision2D collision) {
         touchingFloor = true;
     }
 
